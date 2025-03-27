@@ -1,0 +1,84 @@
+name: mera-store-infra
+
+services:
+  database:
+    container_name: database
+    image: mcr.microsoft.com/mssql/server:latest
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${SA_PASSWORD}
+      - MSSQL_PID=Developer
+      - MSSQL_LCID=1033
+    restart: always
+    ports:
+      - "1433:1433"
+    volumes:
+      - ./data/mssql/backups:/var/opt/mssql/backups
+      - ./data/mssql/data:/var/opt/mssql/data
+      - ./data/mssql/log:/var/opt/mssql/log
+
+  elastic.search:
+    container_name: elastic.search
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.3
+    environment:
+      - node.name=elastic.search
+      - cluster.name=es-docker-cluster
+      - xpack.security.enabled=false
+      - "discovery.type=single-node"
+    networks:
+      - msec-net
+    volumes:
+      - share-data:/usr/share/elasticsearch/data 
+    ports:
+      - "9200:9200"
+
+  # redis.cache:
+    # image: redis:latest
+    # container_name: redis.cache
+    # command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
+    # volumes:
+      # - redis-data:/data
+    # restart: unless-stopped
+    # networks:
+      # - msec-net
+    # ports:
+      # - "6379:6379"
+      
+  # consul:
+    # image: hashicorp/consul:latest
+    # container_name: consul-app
+    # ports:
+      # - '8500:8500'
+    # volumes:
+      # - consul-data:/consul/data 
+    # networks:
+      # - msec-net
+    
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:8.17.3
+    environment:
+      - ELASTICSEARCH_URL=http://elastic.search:9200
+      - ELASTICSEARCH_HOSTS=http://elastic.search:9200
+    networks:
+      - msec-net
+    depends_on:
+      - elastic.search
+    ports:
+      - "5601:5601"
+    volumes:
+      - kibana-data:/usr/share/kibana/data  # Persistent volume for Kibana
+
+volumes:
+  share-data:
+    driver: local
+  kibana-data:  # Declare the volume for Kibana
+    driver: local
+  # redis-data:
+    # driver: local  
+  # consul-data:
+    # driver: local
+
+networks:
+  msec-net:
+    driver: bridge
