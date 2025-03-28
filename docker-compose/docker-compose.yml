@@ -19,7 +19,7 @@ services:
 
   elastic.search:
     container_name: elastic.search
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.3
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.4
     environment:
       - node.name=elastic.search
       - cluster.name=es-docker-cluster
@@ -56,7 +56,7 @@ services:
     
   kibana:
     container_name: kibana
-    image: docker.elastic.co/kibana/kibana:8.17.3
+    image: docker.elastic.co/kibana/kibana:8.17.4
     environment:
       - ELASTICSEARCH_URL=http://elastic.search:9200
       - ELASTICSEARCH_HOSTS=http://elastic.search:9200
