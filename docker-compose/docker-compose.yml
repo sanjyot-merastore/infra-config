@@ -10,6 +10,8 @@ services:
       - MSSQL_PID=Developer
       - MSSQL_LCID=1033
     restart: always
+    networks:
+      - msec-net
     ports:
       - "1433:1433"
     volumes:
@@ -32,17 +34,17 @@ services:
     ports:
       - "9200:9200"
 
-  # redis.cache:
-    # image: redis:latest
-    # container_name: redis.cache
-    # command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
-    # volumes:
-      # - redis-data:/data
-    # restart: unless-stopped
-    # networks:
-      # - msec-net
-    # ports:
-      # - "6379:6379"
+  redis.cache:
+    image: redis:latest
+    container_name: redis.cache
+    command: redis-server --save 20 1 --loglevel warning --requirepass ${redis_password}
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    networks:
+      - msec-net
+    ports:
+      - "6379:6379"
       
   # consul:
     # image: hashicorp/consul:latest
@@ -74,8 +76,8 @@ volumes:
     driver: local
   kibana-data:  # Declare the volume for Kibana
     driver: local
-  # redis-data:
-    # driver: local  
+  redis-data:
+    driver: local  
   # consul-data:
     # driver: local
 
