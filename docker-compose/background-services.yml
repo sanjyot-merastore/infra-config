@@ -1,6 +1,7 @@
 name: mera-store-infra
 
 services:
+  
   logging-api:
     container_name: logging-api
     image: ${DOCKER_REGISTRY-}merastore.service.logging.api:latest
@@ -17,7 +18,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=QA
       - NUGET_PASSWORD=${NUGET_PASSWORD}
       - ASPNETCORE_HTTP_PORTS=8101
-      - ConnectionStrings__LoggingDb=Server=database;Database=Logging;User Id=mera-store-logging;Password=J6k*9Pt@X2v#1Qc$;Encrypt=False;TrustServerCertificate=True # Set your DB connection string
+      - ConnectionStrings__LoggingDb=Server=database,1433;Database=Logging;User Id=mera-store-logging;Password=J6k*9Pt@X2v#1Qc$;Encrypt=False;TrustServerCertificate=True # Set your DB connection string
       - ElasticSearchUrl=http://elastic.search:9200
       
 networks:
